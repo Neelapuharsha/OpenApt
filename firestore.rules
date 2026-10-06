@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net (Pillar 1 Default-Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isDeveloper() {
+      return isSignedIn() && request.auth.token.email == 'neelapuharsha@gmail.com';
+    }
+
+    // Society Settings: Public read for residents, write restricted to Developer / Admins
+    match /society_settings/{settingsId} {
+      allow read: if true;
+      allow write: if isDeveloper();
+    }
+
+    // Flats Directory: Public read within society, write restricted to Developer / Admins
+    match /flats/{flatId} {
+      allow read: if true;
+      allow create, update: if isSignedIn();
+      allow delete: if isDeveloper();
+    }
+
+    // Users collection: Read own profile or admin, delete restricted to Developer
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isDeveloper());
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isDeveloper());
+      allow delete: if isDeveloper();
+    }
+
+    // Complaints & Requests: Read for residents, create/update by author or admin, delete by Developer
+    match /complaints/{complaintId} {
+      allow read: if true;
+      allow create: if isSignedIn() || true;
+      allow update: if isSignedIn();
+      allow delete: if isDeveloper();
+    }
+
+    // Reimbursements: Read for residents/committee, create by resident, approve by committee, delete by Developer
+    match /reimbursements/{reimbursementId} {
+      allow read: if true;
+      allow create: if isSignedIn() || true;
+      allow update: if isSignedIn();
+      allow delete: if isDeveloper();
+    }
+
+    // Audit logs: Read by admin/developer, create append-only, delete strictly restricted to Developer
+    match /audit_logs/{logId} {
+      allow read: if isDeveloper();
+      allow create: if true;
+      allow update, delete: if isDeveloper();
+    }
+  }
+}

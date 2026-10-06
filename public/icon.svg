@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#10b981" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="#334155" stroke-width="3" opacity="0.6"/>
+
+  <!-- Subtle grid lines representing ledger / structure -->
+  <path d="M64 256h384M256 64v384" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.3"/>
+
+  <!-- OpenApt Modern Building Silhouette with Open Door / Transparency -->
+  <g filter="url(#glow)">
+    <!-- Main Tower -->
+    <path d="M160 384V168c0-8.8 7.2-16 16-16h160c8.8 0 16 7.2 16 16v216" fill="#1e293b" stroke="url(#primaryGrad)" stroke-width="12" stroke-linejoin="round"/>
+    
+    <!-- Left Wing (Shorter) -->
+    <path d="M104 384V232c0-8.8 7.2-16 16-16h40v168" fill="#0f172a" stroke="#059669" stroke-width="8" stroke-linejoin="round"/>
+    
+    <!-- Right Wing (Balanced) -->
+    <path d="M352 384V216h40c8.8 0 16 7.2 16 16v152" fill="#0f172a" stroke="#059669" stroke-width="8" stroke-linejoin="round"/>
+
+    <!-- Windows (Illuminated Transparency Grid) -->
+    <rect x="192" y="184" width="28" height="28" rx="6" fill="#38bdf8"/>
+    <rect x="242" y="184" width="28" height="28" rx="6" fill="#38bdf8"/>
+    <rect x="292" y="184" width="28" height="28" rx="6" fill="#38bdf8"/>
+
+    <rect x="192" y="232" width="28" height="28" rx="6" fill="#10b981"/>
+    <rect x="242" y="232" width="28" height="28" rx="6" fill="#38bdf8"/>
+    <rect x="292" y="232" width="28" height="28" rx="6" fill="#10b981"/>
+
+    <rect x="192" y="280" width="28" height="28" rx="6" fill="#38bdf8"/>
+    <rect x="242" y="280" width="28" height="28" rx="6" fill="#10b981"/>
+    <rect x="292" y="280" width="28" height="28" rx="6" fill="#38bdf8"/>
+
+    <!-- Open Transparent Arch / Portal at the base -->
+    <path d="M224 384v-40c0-17.67 14.33-32 32-32s32 14.33 32 32v40" fill="url(#primaryGrad)" opacity="0.9"/>
+    
+    <!-- Golden Rupee / Balance Key Emblem above portal -->
+    <circle cx="256" cy="336" r="14" fill="#fbbf24"/>
+    <path d="M251 331h10M251 336h8M254 331c3 0 4 2 4 4s-2 3-5 3l6 6" stroke="#78350f" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- OpenApt Badge Wordmark Ribbon at bottom -->
+  <rect x="144" y="416" width="224" height="34" rx="17" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+  <text x="256" y="439" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#f8fafc" text-anchor="middle" letter-spacing="3">OPEN<tspan fill="#34d399">APT</tspan></text>
+</svg>

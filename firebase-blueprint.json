@@ -1,0 +1,128 @@
+{
+  "entities": {
+    "users": {
+      "title": "User",
+      "description": "User profile with role, contact info, and flat assignment",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "fullName": { "type": "string", "description": "Full name of the user" },
+        "phone": { "type": "string", "description": "Contact phone number" },
+        "role": {
+          "type": "string",
+          "enum": ["SUPER_ADMIN", "PRESIDENT", "SECRETARY", "TREASURER", "RESIDENT"],
+          "description": "Role of the user in society"
+        },
+        "flatId": { "type": "string", "description": "Associated flat ID" },
+        "createdAt": { "type": "string", "description": "Account creation timestamp" }
+      },
+      "required": ["email", "fullName", "role"]
+    },
+    "flats": {
+      "title": "Flat",
+      "description": "Apartment flat unit details",
+      "type": "object",
+      "properties": {
+        "flatNumber": { "type": "string", "description": "Flat number like A-101" },
+        "block": { "type": "string", "description": "Building block name" },
+        "floor": { "type": "number", "description": "Floor level" },
+        "areaSqft": { "type": "number", "description": "Area in square feet" },
+        "maintenancePaise": { "type": "number", "description": "Monthly maintenance demand in paise" },
+        "status": { "type": "string", "description": "Unit status" },
+        "residentName": { "type": "string", "description": "Current resident name" },
+        "residentPhone": { "type": "string", "description": "Current resident phone" },
+        "isClaimed": { "type": "boolean", "description": "Whether resident has claimed this unit" }
+      },
+      "required": ["flatNumber", "block", "floor", "maintenancePaise"]
+    },
+    "complaints": {
+      "title": "Complaint",
+      "description": "Maintenance request or community feedback",
+      "type": "object",
+      "properties": {
+        "ticketNo": { "type": "string", "description": "Ticket tracking reference" },
+        "type": { "type": "string", "enum": ["APARTMENT_ISSUE", "APP_FEEDBACK", "IMPROVEMENT_IDEA"] },
+        "flatId": { "type": "string", "description": "Associated flat" },
+        "category": { "type": "string", "description": "Plumbing, Electrical, Elevator, etc." },
+        "title": { "type": "string", "description": "Short issue title" },
+        "description": { "type": "string", "description": "Detailed explanation" },
+        "priority": { "type": "string", "enum": ["LOW", "MEDIUM", "URGENT"] },
+        "status": { "type": "string", "enum": ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] },
+        "submittedByName": { "type": "string", "description": "Name of reporter" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["ticketNo", "title", "description", "status"]
+    },
+    "reimbursements": {
+      "title": "Reimbursement",
+      "description": "Out of pocket society expense claim",
+      "type": "object",
+      "properties": {
+        "claimNo": { "type": "string", "description": "Claim reference number" },
+        "flatId": { "type": "string", "description": "Flat ID" },
+        "claimantName": { "type": "string", "description": "Resident claimant" },
+        "description": { "type": "string", "description": "Society expense item" },
+        "amountPaise": { "type": "number", "description": "Amount in paise" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "DISBURSED", "REJECTED"] },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["claimNo", "claimantName", "amountPaise", "status"]
+    },
+    "societySettings": {
+      "title": "SocietySettings",
+      "description": "Society bylaws, bank info, and name",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Society name" },
+        "shortName": { "type": "string", "description": "Short acronym" },
+        "totalFlats": { "type": "number", "description": "Total units" },
+        "defaultMaintenancePaise": { "type": "number", "description": "Default monthly dues" },
+        "updatedAt": { "type": "string", "description": "Last updated" }
+      },
+      "required": ["name", "shortName", "totalFlats"]
+    },
+    "auditLogs": {
+      "title": "AuditLog",
+      "description": "Immutable logged developer actions and deletions",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "description": "Time of action" },
+        "userName": { "type": "string", "description": "Actor name" },
+        "userRole": { "type": "string", "description": "Actor role" },
+        "actorEmail": { "type": "string", "description": "Actor email" },
+        "action": { "type": "string", "description": "Action performed (e.g. DELETE)" },
+        "entityType": { "type": "string", "description": "Entity affected" },
+        "entityId": { "type": "string", "description": "ID of affected entity" },
+        "reason": { "type": "string", "description": "Mandatory explanation" }
+      },
+      "required": ["timestamp", "userName", "userRole", "action", "entityType", "entityId", "reason"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profiles and credentials"
+    },
+    "/flats/{flatId}": {
+      "schema": "flats",
+      "description": "Apartment units"
+    },
+    "/complaints/{complaintId}": {
+      "schema": "complaints",
+      "description": "Community complaints and maintenance requests"
+    },
+    "/reimbursements/{reimbursementId}": {
+      "schema": "reimbursements",
+      "description": "Expense reimbursement claims"
+    },
+    "/society_settings/{settingsId}": {
+      "schema": "societySettings",
+      "description": "Society general configuration"
+    },
+    "/audit_logs/{logId}": {
+      "schema": "auditLogs",
+      "description": "Immutable audit entries"
+    }
+  }
+}

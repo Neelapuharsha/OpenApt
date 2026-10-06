@@ -1,0 +1,6 @@
+{
+  "name": "OpenApt - Apartment Management & Financial Accounting",
+  "description": "Double-entry housing society accounting, resident phone & flat verification onboarding, developer deletion audit safeguards, bylaws, and governance hub.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
