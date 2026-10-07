@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (saved) {
         const parsed = JSON.parse(saved);
         if (
-          parsed.email === 'mirthipativijaya264@gmail.com' ||
+          parsed.email === 'neelapuharsha@gmail.com' ||
           parsed.role === 'SUPER_ADMIN' ||
           parsed.username === 'developer'
         ) {
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     try {
       const rawUser = localStorage.getItem('openapt_user');
-      if (rawUser && rawUser.includes('mirthipativijaya264@gmail.com')) {
+      if (rawUser && rawUser.includes('neelapuharsha@gmail.com')) {
         localStorage.setItem(
           'openapt_user',
           rawUser.replace(/mirthipativijaya264@gmail\.com/g, 'neelapuharsha@gmail.com')

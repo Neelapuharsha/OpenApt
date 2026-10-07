@@ -123,7 +123,7 @@ export const ResidentClaimModal: React.FC<ResidentClaimModalProps> = ({
       const email = result.user.email?.toLowerCase();
 
       // Check if developer
-      if (email === 'neelapuharsha@gmail.com' || email === 'mirthipativijaya264@gmail.com') {
+      if (email === 'neelapuharsha@gmail.com') {
         login({
           username: 'developer',
           email: 'neelapuharsha@gmail.com',

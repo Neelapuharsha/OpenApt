@@ -29,7 +29,7 @@ export const DeveloperDeleteModal: React.FC<DeveloperDeleteModalProps> = ({
   const isSuperAdmin =
     currentUser?.role === 'SUPER_ADMIN' ||
     currentUser?.email === 'neelapuharsha@gmail.com' ||
-    currentUser?.email === 'mirthipativijaya264@gmail.com';
+    currentUser?.email === 'neelapuharsha@gmail.com';
 
   const developerEmail = 'neelapuharsha@gmail.com';
 

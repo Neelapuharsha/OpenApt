@@ -472,7 +472,7 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
     const uRes = db.exec("SELECT * FROM users WHERE LOWER(email) = ? OR LOWER(username) = ? OR phone = ?", [cleanId, cleanId, cleanId]);
     if (!uRes.length || !uRes[0].values.length) {
       // Check if developer email: neelapuharsha@gmail.com (or legacy alias)
-      if (cleanId === 'neelapuharsha@gmail.com' || cleanId === 'developer' || cleanId === 'mirthipativijaya264@gmail.com') {
+      if (cleanId === 'neelapuharsha@gmail.com' || cleanId === 'developer') {
         const token = createSession(db, {
           userId: 1,
           username: 'developer',
@@ -878,8 +878,7 @@ apiRouter.post('/admin/developer-delete', async (req: Request, res: Response) =>
     // Strict Role Validation: ONLY SUPER_ADMIN / Developer allowed
     const isSuperAdmin =
       actor?.role === 'SUPER_ADMIN' ||
-      actor?.email === 'neelapuharsha@gmail.com' ||
-      actor?.email === 'mirthipativijaya264@gmail.com';
+      actor?.email === 'neelapuharsha@gmail.com';
 
     if (!isSuperAdmin) {
       return res.status(403).json({
