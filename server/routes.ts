@@ -937,15 +937,55 @@ apiRouter.post('/admin/developer-delete', async (req: Request, res: Response) =>
         break;
       }
       case 'DEMO_DATA_RESET': {
-        // Clean Slate live mode
-        db.run("DELETE FROM payment_receipts");
-        db.run("DELETE FROM maintenance_bills");
-        db.run("DELETE FROM journal_lines");
-        db.run("DELETE FROM journal_entries");
-        db.run("DELETE FROM reimbursement_claims");
-        db.run("UPDATE society_settings SET is_demo_mode = 0");
-        res.json({ success: true, message: "Clean Slate reset complete" });
-        return; // Return immediately
+        // Atomic database reset for Clean Slate
+        try {
+          db.run("BEGIN TRANSACTION");
+          
+          // Clear all operational data
+          db.run("DELETE FROM payment_receipts");
+          db.run("DELETE FROM maintenance_bills");
+          db.run("DELETE FROM journal_lines");
+          db.run("DELETE FROM journal_entries");
+          db.run("DELETE FROM reimbursement_claims");
+          db.run("DELETE FROM complaints_feedback");
+          db.run("DELETE FROM residents");
+          
+          // Reset society settings
+          db.run("UPDATE society_settings SET is_demo_mode = 0, bank_opening_balance_paise = 25000000");
+
+          // Re-create opening balance journal
+          db.run(`
+            INSERT INTO journal_entries (entry_no, entry_date, description, reference_id, reference_type, created_by, is_reversed, idempotency_key, created_at)
+            VALUES ('JE-2026-0001', '2026-10-01', 'Opening Balance: Society Bank Corpus', 'CORPUS-OPEN', 'SETUP', 'System Administrator', 0, 'OPEN-CORPUS-SSE-2026', datetime('now'))
+          `);
+          const je1Id = db.exec("SELECT last_insert_rowid()")[0].values[0][0] as number;
+          db.run(`
+            INSERT INTO journal_lines (entry_id, account_code, debit_paise, credit_paise, memo) VALUES
+            (?, '1010', 25000000, 0, 'Opening balance in Society Bank Account'),
+            (?, '3010', 0, 25000000, 'Society Corpus & Handover Reserve')
+          `, [je1Id, je1Id]);
+
+          // Audit Log
+          const auditActor = {
+            ...actor,
+            email: 'neelapuharsha@gmail.com',
+            name: actor?.name || 'Harsha Vardhan Neelapu (Developer / Super Admin)',
+            role: 'SUPER_ADMIN'
+          };
+          logAudit(db, auditActor, 'DELETE', 'CLEAN_SLATE', '0', reason.trim(), "Full DB Reset", null);
+
+          db.run("COMMIT");
+          
+          res.json({ 
+            success: true, 
+            message: "Clean Slate completed successfully",
+            reset: { flats: 32, residents: 0, bills: 0, receipts: 0, payments: 0, complaints: 0, reimbursements: 0, journalEntries: 1 }
+          });
+          return;
+        } catch (e) {
+          db.run("ROLLBACK");
+          throw e;
+        }
       }
       default:
         return res.status(400).json({ error: `Unsupported entity type: ${entity_type}` });

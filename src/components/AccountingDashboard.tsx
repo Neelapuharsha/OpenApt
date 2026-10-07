@@ -24,9 +24,9 @@ import { DeveloperDeleteModal } from './DeveloperDeleteModal.js';
 
 type AccountingTab = 'OVERVIEW' | 'BALANCE_SHEET' | 'INCOME_EXPENSE' | 'TRIAL_BALANCE' | 'JOURNAL_ENTRIES' | 'RECEIPTS' | 'REIMBURSEMENTS';
 
-export const AccountingDashboard: React.FC = () => {
+export const AccountingDashboard: React.FC<{ initialTab?: AccountingTab }> = ({ initialTab = 'OVERVIEW' }) => {
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<AccountingTab>('OVERVIEW');
+  const [activeTab, setActiveTab] = useState<AccountingTab>(initialTab);
   const [isLoading, setIsLoading] = useState(false);
 
   // Accounting States

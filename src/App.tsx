@@ -16,6 +16,9 @@ import {
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { Navbar } from './components/Navbar.js';
 import { AccountingDashboard } from './components/AccountingDashboard.js';
+import { MaintenancePage } from './components/MaintenancePage.js';
+import { PaymentsPage } from './components/PaymentsPage.js';
+import { ReportsPage } from './components/ReportsPage.js';
 import { FlatsDirectory } from './components/FlatsDirectory.js';
 import { ComplaintsHub } from './components/ComplaintsHub.js';
 import { GovernanceHub } from './components/GovernanceHub.js';
@@ -184,13 +187,13 @@ function MainApp() {
         {/* Main Content Container */}
         <main className="p-6 md:p-8 max-w-[1300px] w-full flex-1">
           {activeSection === 'DASHBOARD' && <AccountingDashboard />}
-          {activeSection === 'MAINTENANCE' && <AccountingDashboard />}
+          {activeSection === 'MAINTENANCE' && <MaintenancePage />}
           {activeSection === 'RESIDENTS' && (
             <FlatsDirectory onOpenClaimModal={() => setIsClaimModalOpen(true)} />
           )}
-          {activeSection === 'PAYMENTS' && <AccountingDashboard />}
+          {activeSection === 'PAYMENTS' && <PaymentsPage />}
           {activeSection === 'EXPENSES' && <ComplaintsHub />}
-          {activeSection === 'REPORTS' && <AccountingDashboard />}
+          {activeSection === 'REPORTS' && <ReportsPage />}
           {activeSection === 'NOTICES' && <GovernanceHub />}
           {activeSection === 'HELP_ZONE' && <HelpZone />}
           {activeSection === 'AUDIT_LOG' && <AuditLogViewer />}
