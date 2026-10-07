@@ -151,8 +151,8 @@ function MainApp() {
         <div className="pt-4 border-t border-[#f0f1f3] space-y-3 px-2">
           <PWAInstallButton />
           <div className="text-[11px] text-[#6b7280]">
-            <div className="font-semibold text-[#1f2937]">Subhashini Star Enclave</div>
-            <div className="font-mono text-[10px] text-[#9ca3af] mt-0.5">SSE · GAAP Engine Active</div>
+            <div className="font-semibold text-[#1f2937]">Apartment Not Configured</div>
+            <div className="font-mono text-[10px] text-[#9ca3af] mt-0.5">Please onboard society</div>
             <div className="flex items-center gap-1.5 mt-1 text-[10px] text-emerald-600 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Firebase Cloud Active</span>
@@ -179,7 +179,6 @@ function MainApp() {
 
         {/* Top Header */}
         <Navbar
-          currentSectionTitle={getSectionTitle()}
           onOpenClaimModal={() => setIsClaimModalOpen(true)}
           onOpenQuestionnaire={() => setIsQuestionnaireOpen(true)}
         />

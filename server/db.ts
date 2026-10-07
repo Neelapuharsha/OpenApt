@@ -312,4 +312,3 @@ function initSchema(db: Database): void {
   `);
 
 }
-}

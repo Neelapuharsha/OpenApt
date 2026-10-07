@@ -10,12 +10,11 @@ import { useAuth } from '../context/AuthContext.js';
 import { UserRole } from '../types/index.js';
 
 interface NavbarProps {
-  currentSectionTitle: string;
   onOpenClaimModal: () => void;
   onOpenQuestionnaire: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentSectionTitle, onOpenClaimModal, onOpenQuestionnaire }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenClaimModal, onOpenQuestionnaire }) => {
   const { currentUser, logout, switchRole } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [notificationToast, setNotificationToast] = useState<string | null>(null);
@@ -63,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentSectionTitle, onOpenClaim
       <header className="h-14 sm:h-16 bg-white border-b border-[#e5e7eb] px-4 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30">
         <div className="flex-1 min-w-0 mr-3">
           <h1 className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold text-[#1f2937] leading-tight truncate">
-            {currentSectionTitle}
+            OpenApt
           </h1>
         </div>
 
