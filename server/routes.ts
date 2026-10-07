@@ -938,14 +938,14 @@ apiRouter.post('/admin/developer-delete', async (req: Request, res: Response) =>
       }
       case 'DEMO_DATA_RESET': {
         // Clean Slate live mode
-        prevData = "Reset all sample transactions and bills to Live Clean Slate";
         db.run("DELETE FROM payment_receipts");
         db.run("DELETE FROM maintenance_bills");
         db.run("DELETE FROM journal_lines");
         db.run("DELETE FROM journal_entries");
         db.run("DELETE FROM reimbursement_claims");
         db.run("UPDATE society_settings SET is_demo_mode = 0");
-        break;
+        res.json({ success: true, message: "Clean Slate reset complete" });
+        return; // Return immediately
       }
       default:
         return res.status(400).json({ error: `Unsupported entity type: ${entity_type}` });
