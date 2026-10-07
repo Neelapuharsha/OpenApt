@@ -122,13 +122,7 @@ export const AccountingDashboard: React.FC<{ initialTab?: AccountingTab }> = ({ 
   
   if (isConfigured === null) return <div>Loading...</div>;
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[#1f2937]">Good afternoon</h1>
-          <p className="text-[#6b7280] text-[14px]">{societyConfig.name} ({societyConfig.short_name}) · {societyConfig.total_flats} flats</p>
-        </div>
+  const handleGenerateDemands = async () => {
     try {
       const res = await fetch('/api/accounting/demands', {
         method: 'POST',
@@ -145,6 +139,20 @@ export const AccountingDashboard: React.FC<{ initialTab?: AccountingTab }> = ({ 
       alert(err.message);
     }
   };
+
+  return (
+    <div className="space-y-6">
+      {/* Welcome row matching upload */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-[25px] font-bold text-[#1f2937] leading-tight">Good afternoon</h2>
+          <p className="text-[#6b7280] text-[14px]">{societyConfig?.name} ({societyConfig?.short_name}) · {societyConfig?.total_flats} flats</p>
+        </div>
+      </div>
+      
+      {/* ... Dashboard Widgets ... */}
+    </div>
+  );
 
   const handleRecordPayment = async () => {
     if (!payFlatId || !payAmount) return;
