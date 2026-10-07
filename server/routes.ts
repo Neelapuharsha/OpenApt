@@ -111,6 +111,35 @@ export function getAuthenticatedUser(req: Request, db: any): UserSession | null 
   return null;
 }
 
+// Middleware helper to log audit entry
+function logAudit(
+  db: any,
+  actor: { id?: number; name?: string; role?: string; email?: string },
+  action: string,
+  entityType: string,
+  entityId: string,
+  reason: string,
+  previousValue?: any,
+  newValue?: any
+) {
+  const timestamp = new Date().toISOString();
+  db.run(`
+    INSERT INTO audit_logs (timestamp, user_id, user_name, user_role, actor_email, action, entity_type, entity_id, previous_value, new_value, reason)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [timestamp, actor.id || null, actor.name || 'System', actor.role || 'SYSTEM', actor.email || null, action, entityType, entityId, JSON.stringify(previousValue), JSON.stringify(newValue), reason]);
+}
+
+export const authenticate = async (req: Request, res: Response, next: any) => {
+  const db = await getDb();
+  const authUser = getAuthenticatedUser(req, db);
+  if (!authUser) {
+    return res.status(401).json({ error: "Unauthorized: Please log in." });
+  }
+  // @ts-ignore
+  req.user = authUser;
+  next();
+};
+
 // Reset server's database to clean baseline for automated regression suites
 apiRouter.post('/admin/test-reset-clean-db', async (req: Request, res: Response) => {
   try {
@@ -167,36 +196,8 @@ apiRouter.post('/admin/test-reset-clean-db', async (req: Request, res: Response)
   }
 });
 
-// Middleware helper to log audit entry
-function logAudit(
-  db: any,
-  actor: { id?: number; name?: string; role?: string; email?: string },
-  action: string,
-  entityType: string,
-  entityId: string,
-  reason: string,
-  previousValue?: any,
-  newValue?: any
-) {
-  const timestamp = new Date().toISOString();
-  db.run(`
-    INSERT INTO audit_logs (timestamp, user_id, user_name, user_role, actor_email, action, entity_type, entity_id, previous_value, new_value, reason)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `, [
-    timestamp,
-    actor.id || null,
-    actor.name || 'Anonymous',
-    actor.role || 'UNKNOWN',
-    actor.email || null,
-    action,
-    entityType,
-    String(entityId),
-    previousValue ? (typeof previousValue === 'string' ? previousValue : JSON.stringify(previousValue)) : null,
-    newValue ? (typeof newValue === 'string' ? newValue : JSON.stringify(newValue)) : null,
-    reason
-  ]);
-  saveDb();
-}
+
+// Reset server's database to clean baseline for automated regression suites
 
 // --------------------------------------------------------------------------
 // 1. Society Settings
@@ -1381,7 +1382,7 @@ apiRouter.get('/governance/bylaws', async (req: Request, res: Response) => {
   }
 });
 
-apiRouter.post('/governance/bylaws', async (req: Request, res: Response) => {
+apiRouter.post('/governance/bylaws', authenticate, async (req: Request, res: Response) => {
   try {
     const { category, title, content, effective_date, actor } = req.body;
     const db = await getDb();
@@ -1396,24 +1397,7 @@ apiRouter.post('/governance/bylaws', async (req: Request, res: Response) => {
   }
 });
 
-apiRouter.get('/governance/notices', async (req: Request, res: Response) => {
-  try {
-    const db = await getDb();
-    const result = db.exec("SELECT * FROM society_notices ORDER BY is_pinned DESC, id DESC");
-    if (!result.length) return res.json([]);
-    const cols = result[0].columns;
-    res.json(result[0].values.map(v => {
-      const obj: any = {};
-      cols.forEach((c, i) => obj[c] = v[i]);
-      obj.is_pinned = Boolean(obj.is_pinned);
-      return obj;
-    }));
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-apiRouter.post('/governance/notices', async (req: Request, res: Response) => {
+apiRouter.post('/governance/notices', authenticate, async (req: Request, res: Response) => {
   try {
     const { title, content, notice_type, target_audience, is_pinned, published_by } = req.body;
     const db = await getDb();
@@ -1428,23 +1412,7 @@ apiRouter.post('/governance/notices', async (req: Request, res: Response) => {
   }
 });
 
-apiRouter.get('/governance/meetings', async (req: Request, res: Response) => {
-  try {
-    const db = await getDb();
-    const result = db.exec("SELECT * FROM meeting_schedules ORDER BY meeting_date ASC");
-    if (!result.length) return res.json([]);
-    const cols = result[0].columns;
-    res.json(result[0].values.map(v => {
-      const obj: any = {};
-      cols.forEach((c, i) => obj[c] = v[i]);
-      return obj;
-    }));
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-apiRouter.post('/governance/meetings', async (req: Request, res: Response) => {
+apiRouter.post('/governance/meetings', authenticate, async (req: Request, res: Response) => {
   try {
     const { meeting_type, meeting_date, agenda, venue, minutes_url_or_text } = req.body;
     const db = await getDb();
