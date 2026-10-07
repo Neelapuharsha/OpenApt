@@ -58,7 +58,7 @@ function initSchema(db: Database): void {
       currency TEXT DEFAULT 'INR',
       timezone TEXT DEFAULT 'Asia/Kolkata',
       is_demo_mode INTEGER DEFAULT 0,
-      bank_opening_balance_paise INTEGER DEFAULT 25000000,
+      bank_opening_balance_paise INTEGER DEFAULT 0,
       updated_at TEXT
     );
 
@@ -293,22 +293,7 @@ function initSchema(db: Database): void {
     `);
   }
 
-  // Society Settings: Subhashini Star Enclave (SSE)
-  db.run(`
-    INSERT OR REPLACE INTO society_settings (
-      id, name, short_name, address, registration_no, total_flats, default_maintenance_paise, is_demo_mode, bank_opening_balance_paise, updated_at
-    ) VALUES (
-      1, 
-      'Subhashini Star Enclave (SSE)', 
-      'SSE', 
-      'Plot 14-18, Hitech City Main Road, Madhapur, Hyderabad, Telangana 500081', 
-      'REG/HYD/SOC/2021/4892', 
-      32, 
-      450000, 
-      0, 
-      25000000, 
-      datetime('now')
-    );
-  `);
+// Society settings are populated during onboarding
+
 
 }

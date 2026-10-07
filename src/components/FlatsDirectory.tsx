@@ -47,9 +47,33 @@ export const FlatsDirectory: React.FC<FlatsDirectoryProps> = ({ onOpenClaimModal
     }
   };
 
+  const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
+
   useEffect(() => {
-    fetchFlats();
-  }, [currentUser]);
+    fetch('/api/society/config')
+      .then(r => r.json())
+      .then(d => setIsConfigured(d.configured))
+      .catch(() => setIsConfigured(false));
+  }, []);
+
+  useEffect(() => {
+    if (isConfigured) {
+      fetchFlats();
+    }
+  }, [currentUser, isConfigured]);
+
+  if (isConfigured === false) {
+    return (
+      <div className="p-8 text-center border-2 border-dashed border-[#e5e7eb] rounded-xl">
+        <h2 className="text-lg font-bold text-[#1f2937]">Apartment Not Configured</h2>
+        <p className="text-[#6b7280] text-sm mt-2">The apartment structure has not been configured.</p>
+        <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Set Up Apartment</button>
+      </div>
+    );
+  }
+  
+  if (isConfigured === null) return <div>Loading...</div>;
+
 
   const handleAddFlat = async (e: React.FormEvent) => {
     e.preventDefault();

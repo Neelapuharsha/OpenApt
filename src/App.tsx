@@ -13,6 +13,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { Navbar } from './components/Navbar.js';
 import { AccountingDashboard } from './components/AccountingDashboard.js';
@@ -43,7 +44,8 @@ type NavSection =
 
 function MainApp() {
   const { currentUser, needsQuestionnaire } = useAuth();
-  const [activeSection, setActiveSection] = useState<NavSection>('DASHBOARD');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [flats, setFlats] = useState<Flat[]>([]);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
   const [isQuestionnaireOpen, setIsQuestionnaireOpen] = useState(false);
@@ -75,40 +77,24 @@ function MainApp() {
   }, [needsQuestionnaire]);
 
   const navItems = [
-    { id: 'DASHBOARD', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'MAINTENANCE', label: 'Maintenance & Dues', icon: Receipt },
-    { id: 'RESIDENTS', label: 'Residents & Flats', icon: Users },
-    { id: 'PAYMENTS', label: 'Payments & Receipts', icon: CreditCard },
-    { id: 'EXPENSES', label: 'Expenses & Requests', icon: TrendingDown },
-    { id: 'REPORTS', label: 'Financial Reports', icon: FileSpreadsheet },
-    { id: 'NOTICES', label: 'Bylaws & Notices', icon: Bell },
-    { id: 'HELP_ZONE', label: 'Help Zone', icon: HelpCircle },
-    { id: 'AUDIT_LOG', label: 'Audit Trail', icon: ShieldCheck },
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/maintenance', label: 'Maintenance & Dues', icon: Receipt },
+    { path: '/residents', label: 'Residents & Flats', icon: Users },
+    { path: '/payments', label: 'Payments & Receipts', icon: CreditCard },
+    { path: '/expenses', label: 'Expenses & Requests', icon: TrendingDown },
+    { path: '/reports', label: 'Financial Reports', icon: FileSpreadsheet },
+    { path: '/notices', label: 'Bylaws & Notices', icon: Bell },
+    { path: '/help', label: 'Help Zone', icon: HelpCircle },
+    { path: '/audit', label: 'Audit Trail', icon: ShieldCheck },
   ];
-
-  const getSectionTitle = () => {
-    switch (activeSection) {
-      case 'DASHBOARD': return 'Maintenance Dashboard';
-      case 'MAINTENANCE': return 'Maintenance Demand & Collections';
-      case 'RESIDENTS': return 'Flats & Residents Directory';
-      case 'PAYMENTS': return 'Payment Receipts Register';
-      case 'EXPENSES': return 'Expenses & Resident Requests';
-      case 'REPORTS': return 'Financial Statements & Reports';
-      case 'NOTICES': return 'Governance & Society Notices';
-      case 'HELP_ZONE': return 'Help Zone & Guides';
-      case 'AUDIT_LOG': return 'Developer Audit Trail';
-    }
-  };
 
   return (
     <div className="flex min-h-screen bg-[#f5f6f8] text-[#1f2937]">
-      {/* Sidebar matching user uploaded aside */}
       <aside className={`
         w-[230px] bg-white border-r border-[#e5e7eb] p-6 py-6 flex-shrink-0 flex flex-col justify-between
         ${isMobileMenuOpen ? 'fixed inset-y-0 left-0 z-50 shadow-2xl block' : 'hidden md:flex'}
       `}>
         <div>
-          {/* Brand */}
           <div className="flex items-center justify-between pb-6 px-2">
             <div className="text-[19px] font-bold text-[#1f2937]">
               Open<span className="text-blue-600">Apt</span>
@@ -120,16 +106,15 @@ function MainApp() {
             )}
           </div>
 
-          {/* Navigation Buttons */}
           <nav className="space-y-0.5">
             {navItems.map(item => {
-              const isActive = activeSection === item.id;
+              const isActive = location.pathname === item.path;
               const Icon = item.icon;
               return (
                 <button
-                  key={item.id}
+                  key={item.path}
                   onClick={() => {
-                    setActiveSection(item.id as any);
+                    navigate(item.path);
                     setIsMobileMenuOpen(false);
                   }}
                   className={`
@@ -147,7 +132,6 @@ function MainApp() {
           </nav>
         </div>
 
-        {/* Sidebar Install & Footer */}
         <div className="pt-4 border-t border-[#f0f1f3] space-y-3 px-2">
           <PWAInstallButton />
           <div className="text-[11px] text-[#6b7280]">
@@ -161,9 +145,7 @@ function MainApp() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Mobile Header Bar Toggle */}
         <div className="md:hidden bg-white border-b border-[#e5e7eb] px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
@@ -177,32 +159,29 @@ function MainApp() {
           <div className="w-6" />
         </div>
 
-        {/* Top Header */}
         <Navbar
           onOpenClaimModal={() => setIsClaimModalOpen(true)}
           onOpenQuestionnaire={() => setIsQuestionnaireOpen(true)}
         />
 
-        {/* Main Content Container */}
         <main className="p-6 md:p-8 max-w-[1300px] w-full flex-1">
-          {activeSection === 'DASHBOARD' && <AccountingDashboard />}
-          {activeSection === 'MAINTENANCE' && <MaintenancePage />}
-          {activeSection === 'RESIDENTS' && (
-            <FlatsDirectory onOpenClaimModal={() => setIsClaimModalOpen(true)} />
-          )}
-          {activeSection === 'PAYMENTS' && <PaymentsPage />}
-          {activeSection === 'EXPENSES' && <ComplaintsHub />}
-          {activeSection === 'REPORTS' && <ReportsPage />}
-          {activeSection === 'NOTICES' && <GovernanceHub />}
-          {activeSection === 'HELP_ZONE' && <HelpZone />}
-          {activeSection === 'AUDIT_LOG' && <AuditLogViewer />}
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<AccountingDashboard />} />
+            <Route path="/maintenance" element={<MaintenancePage />} />
+            <Route path="/residents" element={<FlatsDirectory onOpenClaimModal={() => setIsClaimModalOpen(true)} />} />
+            <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/expenses" element={<ComplaintsHub />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/notices" element={<GovernanceHub />} />
+            <Route path="/help" element={<HelpZone />} />
+            <Route path="/audit" element={<AuditLogViewer />} />
+          </Routes>
         </main>
       </div>
 
-      {/* Offline Toast */}
       <OfflineIndicator />
 
-      {/* Resident Claim Modal */}
       <ResidentClaimModal
         isOpen={isClaimModalOpen}
         onClose={() => setIsClaimModalOpen(false)}
@@ -212,7 +191,6 @@ function MainApp() {
         }}
       />
 
-      {/* 1-2-3 Questionnaire Modal */}
       <OnboardingQuestionnaireModal
         isOpen={isQuestionnaireOpen}
         onClose={() => setIsQuestionnaireOpen(false)}

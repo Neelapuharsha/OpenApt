@@ -97,7 +97,38 @@ export const AccountingDashboard: React.FC<{ initialTab?: AccountingTab }> = ({ 
     fetchAccountingData();
   }, []);
 
-  const handleGenerateDemands = async () => {
+  const [societyConfig, setSocietyConfig] = useState<any>(null);
+  const [isConfigured, setIsConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch('/api/society/config')
+      .then(r => r.json())
+      .then(d => {
+        setIsConfigured(d.configured);
+        if (d.configured) setSocietyConfig(d);
+      })
+      .catch(() => setIsConfigured(false));
+  }, []);
+
+  if (isConfigured === false) {
+    return (
+      <div className="p-8 text-center border-2 border-dashed border-[#e5e7eb] rounded-xl">
+        <h2 className="text-lg font-bold text-[#1f2937]">Apartment Not Configured</h2>
+        <p className="text-[#6b7280] text-sm mt-2">Your society settings have not been initialized.</p>
+        <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Set Up Apartment</button>
+      </div>
+    );
+  }
+  
+  if (isConfigured === null) return <div>Loading...</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1f2937]">Good afternoon</h1>
+          <p className="text-[#6b7280] text-[14px]">{societyConfig.name} ({societyConfig.short_name}) · {societyConfig.total_flats} flats</p>
+        </div>
     try {
       const res = await fetch('/api/accounting/demands', {
         method: 'POST',

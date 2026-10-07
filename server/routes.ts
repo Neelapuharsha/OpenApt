@@ -140,6 +140,24 @@ export const authenticate = async (req: Request, res: Response, next: any) => {
   next();
 };
 
+// Check if society is onboarded
+apiRouter.get('/society/config', async (req: Request, res: Response) => {
+  try {
+    const db = await getDb();
+    const result = db.exec("SELECT * FROM society_settings LIMIT 1");
+    if (!result.length || !result[0].values.length) {
+      return res.json({ configured: false });
+    }
+    const cols = result[0].columns;
+    const settings: any = {};
+    cols.forEach((c, idx) => settings[c] = result[0].values[0][idx]);
+    res.json({ configured: true, ...settings });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Reset server's database to clean baseline for automated regression suites
 apiRouter.post('/admin/test-reset-clean-db', async (req: Request, res: Response) => {
   try {
@@ -160,34 +178,6 @@ apiRouter.post('/admin/test-reset-clean-db', async (req: Request, res: Response)
     try {
       db.run("DELETE FROM sqlite_sequence WHERE name IN ('flats', 'residents', 'users', 'journal_entries', 'journal_lines', 'maintenance_bills', 'payment_receipts', 'reimbursement_claims', 'complaints_feedback', 'audit_logs')");
     } catch { /* noop */ }
-
-    // Re-seed exactly 32 flats (Blocks A-D, Floors 1-4, Units 1-2) with deterministic IDs 1..32
-    const blocks = ['A', 'B', 'C', 'D'];
-    const floors = [1, 2, 3, 4];
-    let flatIdCounter = 1;
-    for (const block of blocks) {
-      for (const floor of floors) {
-        for (let unit = 1; unit <= 2; unit++) {
-          const flatNum = `${block}-${floor}0${unit}`;
-          db.run(
-            `INSERT INTO flats (id, flat_number, block, floor, area_sqft, maintenance_paise, status) VALUES (?, ?, ?, ?, ?, ?, 'ACTIVE')`,
-            [flatIdCounter++, flatNum, block, floor, 1350, 450000]
-          );
-        }
-      }
-    }
-
-    // Opening Balance: Bank ₹2,50,000, Corpus ₹2,50,000
-    db.run(`
-      INSERT INTO journal_entries (entry_no, entry_date, description, reference_id, reference_type, created_by, is_reversed, idempotency_key, created_at)
-      VALUES ('JE-2026-0001', '2026-10-01', 'Opening Balance: Subhashini Star Enclave Bank Corpus', 'CORPUS-OPEN', 'SETUP', 'Harsha Vardhan Neelapu', 0, 'OPEN-CORPUS-SSE-2026', datetime('now'))
-    `);
-    const je1Id = db.exec("SELECT last_insert_rowid()")[0].values[0][0] as number;
-    db.run(`
-      INSERT INTO journal_lines (entry_id, account_code, debit_paise, credit_paise, memo) VALUES
-      (?, '1010', 25000000, 0, 'Opening balance in HDFC Society Bank Account'),
-      (?, '3010', 0, 25000000, 'Subhashini Star Enclave Corpus & Handover Reserve')
-    `, [je1Id, je1Id]);
 
     saveDb();
     res.json({ success: true, message: "Clean DB reset complete" });
@@ -843,10 +833,14 @@ apiRouter.post('/flats', async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Flat number, block, and floor are required." });
     }
 
+    if (!area_sqft || !maintenance_paise) {
+      return res.status(400).json({ error: "Area and maintenance amount are required." });
+    }
+
     db.run(`
       INSERT INTO flats (flat_number, block, floor, area_sqft, maintenance_paise, status)
       VALUES (?, ?, ?, ?, ?, 'ACTIVE')
-    `, [flat_number.toUpperCase().trim(), block.toUpperCase().trim(), floor, area_sqft || 1200, maintenance_paise || 450000]);
+    `, [flat_number.toUpperCase().trim(), block.toUpperCase().trim(), floor, area_sqft, maintenance_paise]);
 
     const flatId = db.exec("SELECT last_insert_rowid()")[0].values[0][0] as number;
 
